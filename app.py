@@ -43,3 +43,29 @@ def hello_world():
 @app.route("/about")
 def about_author():
     return about_me
+
+
+# http://127.0.0.1:5000/quotes
+@app.route("/quotes")
+def get_quotes():
+    return quotes
+
+
+# http://127.0.0.1:5000/quotes/2
+# http://127.0.0.1:5000/quotes/5
+# http://127.0.0.1:5000/quotes/10
+# http://127.0.0.1:5000/quotes/50
+@app.route("/quotes/<int:quote_id>")
+def get_quote_by_id(quote_id):
+    for quote in quotes:
+        if quote["id"] == quote_id:
+            return quote
+
+    return f"Quote with id={quote_id} not found", 404
+
+
+@app.route("/quotes/count")
+def quotes_count():
+    return {
+        "count": len(quotes)
+    }
