@@ -1,4 +1,4 @@
-from flask import Flask, json
+from flask import Flask, json, request
 
 app = Flask(__name__)
 json.provider.DefaultJSONProvider.ensure_ascii = False
@@ -45,7 +45,7 @@ def about_author():
     return about_me
 
 
-# http://127.0.0.1:5000/quotes
+# GET: http://127.0.0.1:5000/quotes
 @app.route("/quotes")
 def get_quotes():
     return quotes
@@ -69,3 +69,12 @@ def quotes_count():
     return {
         "count": len(quotes)
     }
+
+
+@app.route("/quotes", methods=["POST"])
+def create_quote():
+    new_quote = request.json
+    new_id = quotes[-1]["id"] + 1
+    new_quote["id"] = new_id
+    quotes.append(new_quote)
+    return new_quote, 201
