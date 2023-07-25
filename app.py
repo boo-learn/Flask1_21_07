@@ -78,3 +78,17 @@ def create_quote():
     new_quote["id"] = new_id
     quotes.append(new_quote)
     return new_quote, 201
+
+
+@app.route("/quotes/<int:quote_id>", methods=['PUT'])
+def edit_quote(quote_id):
+    new_data = request.json
+    for quote in quotes:
+        if quote["id"] == quote_id:
+            if new_data.get("author"):
+                quote["author"] = new_data["author"]
+            if new_data.get("text"):
+                quote["text"] = new_data["text"]
+            return quote, 200
+
+    return f"Quote with id={quote_id} not found", 404
