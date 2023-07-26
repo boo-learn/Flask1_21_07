@@ -1,8 +1,27 @@
 import sqlite3
+from pathlib import Path
+from flask import g
 from flask import Flask, json, request
 
 app = Flask(__name__)
 json.provider.DefaultJSONProvider.ensure_ascii = False
+
+BASE_DIR = Path(__file__).parent
+DATABASE = BASE_DIR / 'test.db'
+
+
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = sqlite3.connect(DATABASE)
+    return db
+
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 
 def tuple_to_dict(quote: tuple) -> dict:
@@ -57,9 +76,12 @@ def quotes_count():
 @app.route("/quotes", methods=["POST"])
 def create_quote():
     new_quote = request.json
-    new_id = quotes[-1]["id"] + 1
-    new_quote["id"] = new_id
-    quotes.append(new_quote)
+    connection = get_db()
+    cursor = connection.cursor()
+    sql = f"INSERT INTO quotes (author, text) VALUES ('{new_quote['author']}', '{new_quote['text']}');"
+    cursor.execute(sql)
+    connection.commit()
+    new_quote["id"] = cursor.lastrowid
     return new_quote, 201
 
 
