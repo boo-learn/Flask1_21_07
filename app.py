@@ -15,22 +15,23 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
 
+class AuthorModel(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(32), unique=True)
+    quotes = db.relationship('QuoteModel', backref='author', lazy='dynamic')
+
+    def __init__(self, name):
+        self.name = name
+
+
 class QuoteModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    author = db.Column(db.String(32), unique=False)
+    author_id = db.Column(db.Integer, db.ForeignKey(AuthorModel.id))
     text = db.Column(db.String(255), unique=False)
-    rate = db.Column(db.Integer)
 
     def __init__(self, author, text):
-        self.author = author
+        self.author_id = author.id
         self.text = text
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "author": self.author,
-            "text": self.text
-        }
 
 
 # dict --> JSON - сериализация
