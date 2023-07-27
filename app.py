@@ -22,7 +22,21 @@ class QuoteModel(db.Model):
         self.author = author
         self.text = text
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "author": self.author,
+            "text": self.text
+        }
 
+
+# dict --> JSON - сериализация
+# JSON --> dict - десериализация
+# Object --> dict --> JSON
 @app.route("/quotes")
 def get_quotes():
-    ...
+    quotes: list[QuoteModel] = QuoteModel.query.all()
+    quotes_dict: list[dict] = []
+    for quote in quotes:
+        quotes_dict.append(quote.to_dict())
+    return quotes_dict
