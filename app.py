@@ -23,6 +23,12 @@ class AuthorModel(db.Model):
     def __init__(self, name):
         self.name = name
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
 
 class QuoteModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -32,6 +38,13 @@ class QuoteModel(db.Model):
     def __init__(self, author, text):
         self.author_id = author.id
         self.text = text
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "author": self.author.to_dict()
+        }
 
 
 # dict --> JSON - сериализация
