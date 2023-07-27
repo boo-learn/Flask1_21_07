@@ -1,5 +1,6 @@
 from flask import Flask, abort, request
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent
@@ -11,12 +12,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.app_context().push()
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 
 class QuoteModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author = db.Column(db.String(32), unique=False)
     text = db.Column(db.String(255), unique=False)
+    rate = db.Column(db.Integer)
 
     def __init__(self, author, text):
         self.author = author
