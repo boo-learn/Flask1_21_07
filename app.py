@@ -40,3 +40,20 @@ def get_quotes():
     for quote in quotes:
         quotes_dict.append(quote.to_dict())
     return quotes_dict
+
+
+@app.route("/quotes/<int:quote_id>")
+def get_quote_by_id(quote_id):
+    quote = QuoteModel.query.get(quote_id)
+    if quote is None:
+        return "Not found", 404
+    return quote.to_dict()
+
+
+@app.route("/quotes", methods=["POST"])
+def create_quote():
+    new_quote = request.json
+    quote = QuoteModel(**new_quote)
+    db.session.add(quote)
+    db.session.commit()
+    return quote.to_dict(), 201
